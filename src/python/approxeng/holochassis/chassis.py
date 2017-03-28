@@ -230,7 +230,7 @@ class DeadReckoning:
         self.max_count_value = max_count_value
         self.last_encoder_values = None
         self.last_reading_time = None
-        self.pose = None
+        self.pose = Pose(Point2(0, 0), 0)
 
     def reset(self):
         """
@@ -238,7 +238,7 @@ class DeadReckoning:
         """
         self.last_encoder_values = None
         self.last_reading_time = None
-        self.pose = None
+        self.pose = Pose(Point2(0, 0), 0)
 
     def set_position(self, position):
         """
@@ -283,13 +283,35 @@ class DeadReckoning:
             self.pose = Pose(Point2(0, 0), 0)
         else:
             time_delta = reading_time - self.last_reading_time
-            if self.max_count_value is not None:
-                wheel_speeds = [smallest_difference(current_reading, last_reading, self.max_count_value) / (
-                    self.counts_per_revolution * time_delta) for last_reading, current_reading
-                                in zip(counts, self.last_encoder_values)]
-            else:
-                wheel_speeds = [(current_reading - last_reading) / (self.counts_per_revolution * time_delta)
-                                for last_reading, current_reading in zip(counts, self.last_encoder_values)]
+
+            wheel_speeds = [smallest_difference(current_reading, last_reading, self.max_count_value) / (
+                self.counts_per_revolution * time_delta) for last_reading, current_reading
+                            in zip(counts, self.last_encoder_values)]
+            motion = self.chassis.calculate_motion(speeds=wheel_speeds)
+            self.pose = self.pose.calculate_pose_change(motion, time_delta)
+            self.last_encoder_values = counts
+            self.last_reading_time = reading_time
+        return self.pose
+
+    def update_from_revolutions(self, counts):
+        """
+        Update the pose from calculated wheel revolutions
+        
+        :param counts: 
+            A list of float values containing cumulative wheel angles in revolutions, i.e. if a wheel has rotated two
+            turns clockwise this will be 2.0
+        :return: 
+        """
+        reading_time = time()
+        if self.last_encoder_values is None:
+            self.last_encoder_values = counts
+            self.last_reading_time = reading_time
+            self.pose = Pose(Point2(0, 0), 0)
+
+        else:
+            time_delta = reading_time - self.last_reading_time
+            wheel_speeds = [(current_reading - last_reading) / (self.counts_per_revolution * time_delta)
+                            for last_reading, current_reading in zip(counts, self.last_encoder_values)]
             motion = self.chassis.calculate_motion(speeds=wheel_speeds)
             self.pose = self.pose.calculate_pose_change(motion, time_delta)
             self.last_encoder_values = counts
