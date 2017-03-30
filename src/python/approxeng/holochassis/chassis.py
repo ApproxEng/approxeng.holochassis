@@ -308,7 +308,7 @@ class DeadReckoning:
             self.pose = Pose(Point2(0, 0), 0)
         else:
             time_delta = reading_time - self.last_reading_time
-            wheel_speeds = [(current_reading - last_reading) / (self.counts_per_revolution * time_delta)
+            wheel_speeds = [(current_reading - last_reading) / time_delta
                             for last_reading, current_reading in zip(counts, self.last_encoder_values)]
             motion = self.chassis.calculate_motion(speeds=wheel_speeds)
             self.pose = self.pose.calculate_pose_change(motion, time_delta)
