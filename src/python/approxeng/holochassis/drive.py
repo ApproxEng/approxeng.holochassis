@@ -87,6 +87,23 @@ class Drive:
             motion = self.motion_limit.limit_and_return(motion)
         self.set_wheel_speeds_from_motion(motion)
 
+    def reset_dead_reckoning(self):
+        """
+        Reads encoder values, then resets the pose held by the dead reckoning module. We do this because otherwise
+        any hardware implementations which track absolute position will lead to a huge incorrect reading for the first
+        dead reckoning period after a startup.
+        """
+        self.update_dead_reckoning()
+        self.dead_reckoning.reset()
+
+    def estimated_pose(self):
+        """
+        Return the pose from the dead reckoning managed by this class. Convenience method so we don't have to do
+        e.g. drive.dead_reckoning.pose all the time
+        :return: 
+        """
+        return self.dead_reckoning.pose
+
     def drive_at(self, x, y, speed, turn_speed=pi, min_distance=10, on_approach=None):
         """
         Set and return a motion to get to a target specified relative to the robot's coordinate system. Note 
@@ -147,7 +164,7 @@ class Drive:
         """
         p = self.dead_reckoning.pose.position
         target_point = Point2(x=x - p.x, y=y - p.y)
-        target_point = rotate_point(target_point, -self.front-self.dead_reckoning.pose.orientation)
+        target_point = rotate_point(target_point, -self.front - self.dead_reckoning.pose.orientation)
         return self.drive_at(x=target_point.x, y=target_point.y, speed=speed, turn_speed=turn_speed,
                              min_distance=min_distance, on_approach=on_approach)
 
