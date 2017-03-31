@@ -125,7 +125,13 @@ class Drive:
         :return: 
             The :class:`approxeng.holochassis.chassis.Motion` that was applied.
         """
-        # print x,y
+        # Explicitly cast to floats in case we're not...
+        x = float(x)
+        y = float(y)
+        speed = float(speed)
+        turn_speed = float(turn_speed)
+        min_distance = float(min_distance)
+
         if min_distance is not None and sqrt(x * x + y * y) < min_distance:
             motion = Motion(translation=Vector2(0, 0), rotation=0)
             if on_approach is not None:
@@ -145,6 +151,7 @@ class Drive:
                 # Angle is clockwise rotation
                 angle = asin(x / y)
                 arc_length = angle * radius
+                print x,y,angle,arc_length
                 motion = Motion(translation=Vector2(0, speed), rotation=angle * speed / arc_length)
         self.set_motion(motion)
         return motion
