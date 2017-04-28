@@ -2,19 +2,19 @@ from math import cos, sin, degrees, radians, pi
 from time import time
 
 from euclid import Vector2, Point2
-from numpy import array as np_array
-from numpy.linalg import solve as np_solve
+
+try:
+    # We only need numpy under some conditions, try to import it and mark whether we succeeded
+    from numpy import array as np_array
+    from numpy.linalg import solve as np_solve
+
+    NUMPY_AVAILABLE = True
+except ImportError:
+    # If not this isn't a problem unless you've got more than three wheels and need the 'motion from wheel speeds'
+    # functionality. If this is the case you should probably go and get numpy first.
+    NUMPY_AVAILABLE = False
 
 __author__ = 'tom'
-
-
-def test():
-    chassis = HoloChassis(wheels=[
-        HoloChassis.OmniWheel(position=Point2(1, 0), angle=0, radius=60),
-        HoloChassis.OmniWheel(position=Point2(-1, 0), angle=0, radius=60)]
-    )
-    print chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5))
-    print chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5), origin=Point2(1, 0))
 
 
 def rotate_point(point, angle, origin=None):
@@ -482,12 +482,55 @@ class HoloChassis:
             A sequence of :class:`triangula.chassis.HoloChassis.OmniWheel` objects defining the wheels for this chassis.
         """
         self.wheels = wheels
-        self._matrix_coefficients = np_array([[wheel.co_x, wheel.co_y, wheel.co_theta] for wheel in self.wheels])
+        if NUMPY_AVAILABLE:
+            # If we have numpy available, calculate the matrix of coefficients for solving for motion from wheel speeds
+            self._matrix_coefficients = np_array([[wheel.co_x, wheel.co_y, wheel.co_theta] for wheel in self.wheels])
+        if len(wheels) == 3:
+            w1 = wheels[0]
+            w2 = wheels[1]
+            w3 = wheels[2]
+            # special case code to handle three wheeled chassis without requiring numpy
+            self._green = w1.co_x * w2.co_y - w1.co_y * w2.co_x
+            self._orange = w2.co_theta * w1.co_x - w1.co_theta * w2.co_x
+            self._yellow = w3.co_theta * w1.co_x - w1.co_theta * w3.co_x
+            # The large constant used as a divisor when calculating the first of the unknowns
+            self._main_divisor = self._orange * (w3.co_y * w1.co_x - w1.co_y * w3.co_x) - self._yellow * self._green
 
     def calculate_motion(self, speeds):
         """
         Invert the motion to speed calculation to obtain the actual linear and angular velocity of the chassis given
+        a vector of wheel speeds. 
+        
+        If there are exactly three speeds (and therefore the chassis has three wheels), an optimised version of the
+        algorithm is used which solves explicitly, otherwise if numpy is available it's used to calculate a unique
+        solution. The three-wheel explicit algorithm is approximately 5 times faster than numpy's linear solver
+        
+        See http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linalg.solve.html for more details on the
+        linear solver
+
+        If this function is called on a list of speeds of length other than 3 and numpy is not available an empty Motion
+        will be returned
+
+        :param speeds:
+            An array of wheel speeds, expressed as floats with units of radians per second, positive being towards
+            the wheel vector.
+        :return:
+            A :class:`triangula.chassis.Motion` object containing the calculated translation and rotation in the robot's
+            coordinate space.
+        """
+        if len(speeds) == 3:
+            return self._calculate_motion_simple(speeds)
+        elif NUMPY_AVAILABLE:
+            return self._calculate_motion_numpy(speeds)
+        else:
+            return Motion(translation=Vector2(x=0, y=0), rotation=0)
+
+    def _calculate_motion_numpy(self, speeds):
+        """
+        Invert the motion to speed calculation to obtain the actual linear and angular velocity of the chassis given
         a vector of wheel speeds. See http://docs.scipy.org/doc/numpy-1.10.1/reference/generated/numpy.linalg.solve.html
+
+        Numpy must be available to use this function
 
         :param speeds:
             An array of wheel speeds, expressed as floats with units of radians per second, positive being towards
@@ -500,6 +543,36 @@ class HoloChassis:
         return Motion(Vector2(x=float(motion_array[0]),
                               y=float(motion_array[1])),
                       rotation=float(motion_array[2]))
+
+    def _calculate_motion_simple(self, speeds):
+        """
+        As _calculate_motion_numpy, but using an exact algebraic solution which doesn't require numpy. This variant 
+        only works when there are exactly three wheels (in which case it's much faster), otherwise an empty Motion is 
+        returned.
+        
+        :param speeds:
+            An array of wheel speeds, expressed as floats with units of radians per second, positive being towards
+            the wheel vector.
+        :return:
+            A :class:`triangula.chassis.Motion` object containing the calculated translation and rotation in the robot's
+            coordinate space.
+        """
+        if len(speeds) != 3:
+            return Motion(translation=Vector2(x=0, y=0), rotation=0)
+        else:
+            d1 = speeds[0]
+            d2 = speeds[1]
+            d3 = speeds[2]
+            y = (self._orange * (self.wheels[0].co_x * d3 - self.wheels[2].co_x * d1) - self._yellow * (
+                self.wheels[0].co_x * d2 - self.wheels[1].co_x * d1)) / self._main_divisor
+            theta = (self.wheels[0].co_x * d2 - self.wheels[1].co_x * d1 - self._green * y) / self._orange
+            if self.wheels[0].co_x != 0:
+                x = (d1 - self.wheels[0].co_y * y - self.wheels[0].co_theta * theta) / self.wheels[0].co_x
+            elif self.wheels[1].co_x != 0:
+                x = (d2 - self.wheels[1].co_y * y - self.wheels[1].co_theta * theta) / self.wheels[1].co_x
+            else:
+                x = (d3 - self.wheels[2].co_y * y - self.wheels[2].co_theta * theta) / self.wheels[2].co_x
+            return Motion(translation=Vector2(x=x, y=y), rotation=theta)
 
     def get_max_translation_speed(self):
         """
