@@ -9,9 +9,9 @@ from setuptools import setup
 
 setup(
     name='approxeng.holochassis',
-    version='0.1',
+    version='0.2',
     description='Python code for holonomic chassis dynamics',
-    classifiers=['Programming Language :: Python :: 2.7'],
+    classifiers=['Programming Language :: Python :: 2.7', 'Programming Language :: Python :: 3.4'],
     url='https://github.com/ApproxEng/approxeng.holochassis/',
     author='Tom Oinn',
     author_email='tomoinn@gmail.com',
