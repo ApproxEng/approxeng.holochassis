@@ -1,10 +1,9 @@
 from threading import Thread
 from time import time, sleep
 
-from euclid import Vector2, Point2
-
 from approxeng.holochassis.chassis import Motion, Pose
 from approxeng.holochassis.drive import Drive
+from euclid import Vector2, Point2
 
 
 class SimulationDrive(Drive):
@@ -50,7 +49,7 @@ class Simulation(Thread):
         self.motion = motion
 
     def run(self):
-        print 'Dynamics simulation starting'
+        print('Dynamics simulation starting')
         while self.running:
             now = time()
             time_delta = now - self.last_update_time
@@ -59,7 +58,7 @@ class Simulation(Thread):
             if self.after_simulation_callback is not None:
                 self.after_simulation_callback()
             sleep(self.update_delay)
-        print 'Dynamics simulation stopping'
+        print('Dynamics simulation stopping')
 
     def stop(self):
         self.running = False

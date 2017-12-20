@@ -1,9 +1,10 @@
+from abc import ABCMeta, abstractmethod
+from math import asin, pi, sqrt
+from time import sleep
+
 from approxeng.holochassis.chassis import rotate_vector, Motion, DeadReckoning, rotate_point
 from approxeng.holochassis.dynamics import MotionLimit
 from euclid import Vector2, Point2
-from math import asin, pi, sqrt
-from abc import ABCMeta, abstractmethod
-from time import sleep
 
 
 class Waypoints:
@@ -151,7 +152,7 @@ class Drive:
                 # Angle is clockwise rotation
                 angle = asin(x / y)
                 arc_length = angle * radius
-                print x,y,angle,arc_length
+                print(x, y, angle, arc_length)
                 motion = Motion(translation=Vector2(0, speed), rotation=angle * speed / arc_length)
         self.set_motion(motion)
         return motion

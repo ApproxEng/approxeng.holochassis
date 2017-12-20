@@ -167,7 +167,7 @@ class Motion:
     when viewed from the direction relative to the plane such that X is positive to the right and Y positive upwards.
     """
 
-    def __init__(self, translation=None, rotation=0):
+    def __init__(self, translation=None, x=None, y=None, rotation=0):
         """
         Constructor
 
@@ -179,6 +179,8 @@ class Motion:
         """
         if translation is not None:
             self.translation = translation
+        elif x is not None and y is not None:
+            self.translation = Vector2(x, y)
         else:
             self.translation = Vector2(0, 0)
         self.rotation = rotation
@@ -284,7 +286,7 @@ class DeadReckoning:
         else:
             time_delta = reading_time - self.last_reading_time
             wheel_speeds = [smallest_difference(current_reading, last_reading, self.max_count_value) / (
-                self.counts_per_revolution * time_delta) for last_reading, current_reading
+                    self.counts_per_revolution * time_delta) for last_reading, current_reading
                             in zip(counts, self.last_encoder_values)]
             motion = self.chassis.calculate_motion(speeds=wheel_speeds)
             self.pose = self.pose.calculate_pose_change(motion, time_delta)
@@ -558,13 +560,13 @@ class HoloChassis:
             coordinate space.
         """
         if len(speeds) != 3:
-            return Motion(translation=Vector2(x=0, y=0), rotation=0)
+            return Motion()
         else:
             d1 = speeds[0]
             d2 = speeds[1]
             d3 = speeds[2]
             y = (self._orange * (self.wheels[0].co_x * d3 - self.wheels[2].co_x * d1) - self._yellow * (
-                self.wheels[0].co_x * d2 - self.wheels[1].co_x * d1)) / self._main_divisor
+                    self.wheels[0].co_x * d2 - self.wheels[1].co_x * d1)) / self._main_divisor
             theta = (self.wheels[0].co_x * d2 - self.wheels[1].co_x * d1 - self._green * y) / self._orange
             if self.wheels[0].co_x != 0:
                 x = (d1 - self.wheels[0].co_y * y - self.wheels[0].co_theta * theta) / self.wheels[0].co_x
@@ -572,7 +574,7 @@ class HoloChassis:
                 x = (d2 - self.wheels[1].co_y * y - self.wheels[1].co_theta * theta) / self.wheels[1].co_x
             else:
                 x = (d3 - self.wheels[2].co_y * y - self.wheels[2].co_theta * theta) / self.wheels[2].co_x
-            return Motion(translation=Vector2(x=x, y=y), rotation=theta)
+            return Motion(x=x, y=y, rotation=theta)
 
     def get_max_translation_speed(self):
         """

@@ -15,5 +15,5 @@ drive.front = pi / 2
 show_plot(simulation).start()
 simulation.start()
 Waypoints(drive=drive, speed=200, turn_speed=pi).follow([(300, 600), (-200, -200), (0, 350), (100, 500)])
-print 'Waypoint set completed'
+print('Waypoint set completed')
 simulation.stop()
