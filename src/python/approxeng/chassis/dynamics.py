@@ -1,6 +1,6 @@
 from time import time as time_now
 
-from approxeng.holochassis.chassis import Motion
+from approxeng.chassis import Motion
 
 
 class MotionLimit:

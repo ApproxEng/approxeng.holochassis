@@ -1,8 +1,8 @@
 from threading import Thread
 from time import time, sleep
 
-from approxeng.holochassis.chassis import Motion, Pose
-from approxeng.holochassis.drive import Drive
+from approxeng.chassis import Motion, Pose
+from approxeng.chassis.drive import Drive
 from euclid import Vector2, Point2
 
 

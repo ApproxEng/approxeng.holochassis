@@ -1,8 +1,8 @@
 from time import time
 
+from approxeng.chassis import HoloChassis, Motion, OmniWheel
+from approxeng.chassis.util import get_regular_triangular_chassis
 from euclid import Point2, Vector2
-
-from approxeng.holochassis.chassis import get_regular_triangular_chassis, HoloChassis, Motion
 
 
 def test_timing(iterations=1000):
@@ -23,11 +23,11 @@ def test_timing(iterations=1000):
 
 def test():
     chassis = HoloChassis(wheels=[
-        HoloChassis.OmniWheel(position=Point2(1, 0), angle=0, radius=60),
-        HoloChassis.OmniWheel(position=Point2(-1, 0), angle=0, radius=60)]
+        OmniWheel(position=Point2(1, 0), angle=0, radius=60),
+        OmniWheel(position=Point2(-1, 0), angle=0, radius=60)]
     )
-    print chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5))
-    print chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5), origin=Point2(1, 0))
+    print(chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5)))
+    print(chassis.get_wheel_speeds(Motion(translation=Vector2(0, 0), rotation=0.5), origin=Point2(1, 0)))
 
 
 test_timing()

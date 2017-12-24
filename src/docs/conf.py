@@ -1,5 +1,5 @@
 # General information about the project.
-project = u'Approximate Engineering - HoloChassis'
+project = u'Approximate Engineering - Chassis'
 copyright = u'2017, Tom Oinn'
 author = u'Tom Oinn'
 
@@ -121,7 +121,7 @@ html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Configures links into the main Python language docs
-intersphinx_mapping = {'python': ('https://docs.python.org/2.7', None)}
+intersphinx_mapping = {'python': ('https://docs.python.org/3.5', None)}
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
@@ -164,7 +164,7 @@ html_show_sourcelink = False
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
 # base URL from which the finished HTML is served.
-html_use_opensearch = 'https://pythonhosted.org/approxeng.holochassis'
+html_use_opensearch = 'https://pythonhosted.org/approxeng.chassis'
 
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 html_file_suffix = '.html'

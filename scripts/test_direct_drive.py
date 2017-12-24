@@ -1,9 +1,8 @@
 from math import pi
 
-from approxeng.holochassis.chassis import get_regular_triangular_chassis
-from approxeng.holochassis.drive import Waypoints
-from approxeng.holochassis.simulation import Simulation, SimulationDrive
-from approxeng.holochassis.simulationplot import show_plot
+from approxeng.chassis.simulation import Simulation, SimulationDrive
+from approxeng.chassis.simulationplot import show_plot
+from approxeng.chassis.util import get_regular_triangular_chassis
 
 simulation = Simulation()
 drive = SimulationDrive(simulation=simulation,
@@ -12,6 +11,6 @@ drive = SimulationDrive(simulation=simulation,
                                                                max_rotations_per_second=500 / 60))
 show_plot(simulation).start()
 simulation.start()
-drive.drive_at(x=70,y=150,speed=200,turn_speed=pi)
+drive.drive_at(x=70, y=150, speed=200, turn_speed=pi)
 while 1:
     pass

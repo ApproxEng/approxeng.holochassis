@@ -2,8 +2,8 @@ from abc import ABCMeta, abstractmethod
 from math import asin, pi, sqrt
 from time import sleep
 
-from approxeng.holochassis.chassis import rotate_vector, Motion, DeadReckoning, rotate_point
-from approxeng.holochassis.dynamics import MotionLimit
+from approxeng.chassis import rotate_vector, Motion, DeadReckoning, rotate_point
+from approxeng.chassis.dynamics import MotionLimit
 from euclid import Vector2, Point2
 
 

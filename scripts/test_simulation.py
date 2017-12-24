@@ -1,9 +1,9 @@
 from math import pi
 
-from approxeng.holochassis.chassis import get_regular_triangular_chassis
-from approxeng.holochassis.drive import Waypoints
-from approxeng.holochassis.simulation import Simulation, SimulationDrive
-from approxeng.holochassis.simulationplot import show_plot
+from approxeng.chassis.util import get_regular_triangular_chassis
+from approxeng.chassis.drive import Waypoints
+from approxeng.chassis.simulation import Simulation, SimulationDrive
+from approxeng.chassis.simulationplot import show_plot
 
 simulation = Simulation()
 drive = SimulationDrive(simulation=simulation,
