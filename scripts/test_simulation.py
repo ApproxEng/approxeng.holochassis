@@ -5,6 +5,9 @@ from approxeng.chassis.drive import Waypoints
 from approxeng.chassis.simulation import Simulation, SimulationDrive
 from approxeng.chassis.simulationplot import show_plot
 
+# On MacOS you might need to do echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc to get this to work and avoid the
+# 'Not installed as a framework' you otherwise pick up from the brew based installation of Python3
+
 simulation = Simulation()
 drive = SimulationDrive(simulation=simulation,
                         chassis=get_regular_triangular_chassis(wheel_distance=160,

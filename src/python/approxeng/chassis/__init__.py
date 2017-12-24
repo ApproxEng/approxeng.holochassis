@@ -555,7 +555,7 @@ class HoloChassis:
             A sequence of :class:`approxeng.chassis.Wheel` objects defining the wheels for this chassis.
         """
         self.wheels = wheels
-        if NUMPY_AVAILABLE and len(wheels) != 3:
+        if NUMPY_AVAILABLE:
             # If we have numpy available, calculate the matrix of coefficients for solving for motion from wheel speeds
             self._matrix_coefficients = np_array([[wheel.co_x, wheel.co_y, wheel.co_theta] for wheel in self.wheels])
         if len(wheels) == 3:
@@ -704,10 +704,10 @@ class HoloChassis:
             d = point - origin
             return d.cross() * motion.rotation + motion.translation
 
-        wheel_speeds = list(wheel.speed(velocity_at(wheel.position)) for wheel in self.wheels)
+        wheel_speeds = list(wheel.speed(velocity_at(wheel.location)) for wheel in self.wheels)
         scale = 1.0
         for speed, wheel in zip(wheel_speeds, self.wheels):
-            if wheel.max_speed is not None and abs(speed) > wheel.max_speed:
-                wheel_scale = wheel.max_speed / abs(speed)
+            if wheel.maximum_rotation_per_second is not None and abs(speed) > wheel.maximum_rotation_per_second:
+                wheel_scale = wheel.maximum_rotation_per_second / abs(speed)
                 scale = min(scale, wheel_scale)
         return WheelSpeeds(speeds=list(speed * scale for speed in wheel_speeds), scaling=scale)
