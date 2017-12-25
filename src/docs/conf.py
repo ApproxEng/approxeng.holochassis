@@ -22,7 +22,6 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.graphviz',
     'sphinx.ext.mathjax',
-    'sphinxcontrib.youtube'
 ]
 
 # Configure graphviz to generate PNG and set up some default colours and graph styling. We were using SVGs here, but
