@@ -1,5 +1,5 @@
 __author__ = 'tom'
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Makes use of the sphinx and sphinx-pypi-upload packages. To build for local development
 # use 'python setup.py develop'. To upload a version to pypi use 'python setup.py clean sdist upload'.
@@ -16,7 +16,7 @@ setup(
     author='Tom Oinn',
     author_email='tomoinn@gmail.com',
     license='ASL2.0',
-    packages=['approxeng.holochassis'],
+    packages=find_packages(),
     install_requires=['numpy==1.12.1'],
     include_package_data=True,
     test_suite='nose.collector',
